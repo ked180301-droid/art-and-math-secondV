@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Невидимая нить</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Добавляем MotionPathPlugin для точной работы с длиной SVG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8f4e6;
+            color: #2c2c2c;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            overflow-x: hidden;
+        }
+
+        .cover {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 4.5rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            letter-spacing: 2px;
+            color: #d93838;
+        }
+
+        .story-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .story-block {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            margin: 0; 
+            padding: 80px 0; 
+            min-height: 300px;
+        }
+
+        .layout-text-left { flex-direction: row; }
+        .layout-text-right { flex-direction: row-reverse; }
+
+        .story-text {
+            width: 45%;
+            font-size: 1.7rem;
+            line-height: 1.9;
+            font-style: italic;
+            color: #4a4a4a;
+            z-index: 2;
+        }
+
+        .story-visual {
+            width: 45%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2; 
+            min-height: 200px;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .story-image {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        /* Убираем жесткие высоты, чтобы контейнеры подстраивались */
+        #loop-block, #voice-block, #heart-block {
+            min-height: 50vh;
+        }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+        .anim-float { animation: float 6s ease-in-out infinite; }
+
+        /* ЕДИНЫЙ КОНТЕЙНЕР ДЛЯ ЛИНИИ */
+        #global-svg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        @media (max-width: 768px) {
+            .story-block { flex-direction: column !important; justify-content: center; padding: 50px 0; }
+            .story-text, .story-visual { width: 100%; text-align: center; }
+            .story-visual { margin-top: 30px; min-height: 150px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cover">
+        <div class="title">Невидимая нить</div>
+        <div class="subtitle">расстояние, которое соединяет</div>
+    </div>
+
+    <div class="story-container" id="container">
+        <!-- SVG БУДЕТ ВСТАВЛЕН СЮДА -->
+
+        <!-- БЛОКИ ИСТОРИИ -->
+        <div class="story-block layout-text-left"><div class="story-text">Иногда самое важное начинается почти незаметно.</div><div class="story-visual"></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">В японском искусстве есть понятие "Ма" — свободное пространство. Но оно никогда не бывает пустым.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image1.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">В день нашей первой встречи пространство, между нами, вдруг перестало быть пустым и наполнилось смыслом.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_1.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right" id="loop-block"><div class="story-text">С тех пор эта невидимая нить всегда, между нами.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Иногда близость начинается ещё до того, как люди успевают стать друг другу привычными.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_2.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">В скалолазании «восьмерка» — главный узел страховки, который символизирует абсолютную надежность и доверие. Мне нравится думать, что в какой-то момент эта нить между нами затянулась чуть крепче — и уже никогда не развязалась.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_3.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">У нашей истории появилось расстояние. Но оно не разъединяло, а только яснее показывало, как ты мне дорог.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_4.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">Километры стали не преградой, а дорогой навстречу.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_5.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Я помню это чувство: ещё немного — и мы снова будем рядом.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_6.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">Мы могли смотреть из разных окон, но всё равно были внутри одного ожидания.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_7.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Когда мы засыпаем порознь, я чувствую натяжение этой нити. Но я закрываю глаза и вспоминаю твое тепло. Мы можем просыпаться в разных городах, но утро у нас одно на двоих.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_8.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right" id="voice-block"><div class="story-text">Твой голос всегда сокращал расстояние лучше любых поездов.</div><div class="story-visual"></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Есть вещи, которые особенно ясно понимаешь в скалолазании: В скалолазании самое главное — доверять тому, кто тебя страхует. В хорошей страховке есть нечто очень похожее на любовь: внимательность, точность и готовность подхватить.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_9.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">С тобой мне не страшно брать новую высоту.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_10.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Потому что знаю — если я оступлюсь...<br>...ты меня удержишь.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_11.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">Ты не сдерживаешь меня — ты даёшь мне пространство быть собой и даришь чувство безопасности.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_12.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">В какой-то момент стало мало просто приезжать друг к другу. Хотелось оставаться.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_13.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">У каждого большого чувства однажды появляется простая материальная форма.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_14.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Примерно год назад рядом у двери встала еще одна пара обуви. Или не одна…</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_15.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">С тех пор любовь для меня — это не только ждать встречи. Это ещё и делать самые обычные вещи сразу на двоих.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_16.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Я люблю не только наши большие моменты. Мне нравится то, как мы справляемся с обычной жизнью вдвоём.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_17.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">Любовь вдруг стала состоять из мелочей. И именно поэтому стала еще сильнее.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_18.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Мне очень дорого, что рядом с тобой можно просто помолчать и при этом не чувствовать пустоты.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_19.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">Раньше я чувствовала расстояние особенно остро ночью. Теперь ночью я просто ищу тебя рукой сквозь сон.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_20.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left"><div class="story-text">Тогда нить связывала нас через расстояние. Сейчас она стала теплом.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_21.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-right"><div class="story-text">Я люблю твой спокойный взгляд, который умеет останавливать мою тревогу. И то, как ты улыбаешься, когда думаешь, что я не смотрю.</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_22.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+        <div class="story-block layout-text-left" id="heart-block"><div class="story-text">Ты — мой самый ровный ритм и самое сильное сердцебиение.<br><br>Ты человек, рядом с которым мне спокойно, интересно, смешно и по-настоящему хорошо. Для меня это и есть любовь.<br><br>И я хочу, чтобы так было всегда…</div><div class="story-visual"><div class="image-placeholder anim-float"><img src="image_23.png" class="story-image" onerror="this.style.display='none'"></div></div></div>
+    </div>
+
+   <script>
+    window.addEventListener("load", () => {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Убираем старый глобальный SVG, если он остался в коде
+        const oldGlobal = document.getElementById('global-svg-container');
+        if (oldGlobal) oldGlobal.remove();
+
+        const blocks = document.querySelectorAll('.story-block');
+        let stTriggers = [];
+
+        function buildStoryLines() {
+            // Очищаем старые анимации перед перерисовкой
+            stTriggers.forEach(t => t.kill());
+            stTriggers = [];
+
+            blocks.forEach((block, index) => {
+                // 1. Создаем локальный SVG внутри каждого блока
+                let svg = block.querySelector('.local-svg');
+                if (!svg) {
+                    block.insertAdjacentHTML('afterbegin', `
+                        <svg class="local-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; overflow: visible;">
+                            <path class="path-front" fill="none" stroke="#d93838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    `);
+                    svg = block.querySelector('.local-svg');
+                }
+                const path = block.querySelector('.path-front');
+
+                const w = block.offsetWidth;
+                const h = block.offsetHeight;
+                if (w === 0 || h === 0) return;
+
+                svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+                const cx = w / 2;
+                const cy = h / 2;
+                const isLeft = block.classList.contains('layout-text-left');
+                const tx = isLeft ? cx + w * 0.25 : cx - w * 0.25;
+
+                // Линия ВСЕГДА начинается по центру сверху
+                let d = `M${cx},0 `;
+
+                if (block.id === 'loop-block') {
+                    const sign = isLeft ? 1 : -1;
+                    d += `C${cx},${cy - 150} ${tx + 60 * sign},${cy - 100} ${tx + 60 * sign},${cy - 40} `;
+                    d += `C${tx + 60 * sign},${cy + 60} ${tx - 80 * sign},${cy + 60} ${tx - 80 * sign},${cy} `;
+                    d += `C${tx - 80 * sign},${cy - 80} ${tx + 30 * sign},${cy - 80} ${tx},${cy} `;
+                    d += `C${tx - 30 * sign},${cy + 100} ${cx},${cy + 100} ${cx},${h} `;
+                } else if (block.id === 'voice-block') {
+                    const wx1 = isLeft ? cx + 20 : 20;
+                    const wx2 = isLeft ? w - 20 : cx - 20;
+                    d += `C${cx},${cy - 80} ${wx1},${cy - 40} ${wx1},${cy} `;
+                    const amps = [0, 3, -2, 5, -4, 8, -6, 12, -10, 18, -15, 25, -20, 35, -30, 50, -45, 65, -55, 85, -75, 110, -100, 80, -70, 60, -50, 45, -35, 30, -25, 50, -45, 80, -75, 120, -110, 90, -85, 60, -50, 40, -30, 25, -20, 15, -10, 8, -6, 5, -3, 0];
+                    const step = (wx2 - wx1) / (amps.length - 1);
+                    amps.forEach((amp, i) => { d += `L${wx1 + i * step},${cy + amp} `; });
+                    d += `C${wx2},${cy + 40} ${cx},${cy + 80} ${cx},${h} `;
+                } else if (block.id === 'heart-block') {
+                    const hx1 = isLeft ? cx + 20 : 20;
+                    const hx2 = isLeft ? w - 20 : cx - 20;
+                    d += `C${cx},${cy - 80} ${hx1},${cy - 40} ${hx1},${cy} `;
+                    const amps = [0, 4, -3, 6, -5, 8, -6, 10, -8, 12, -10, 18, -25, 28, -35, 38, -45, 48, -55, 58, -65, 68, -75, 80, -60, 90, -40, 100, -20, 130, -20, 100, -40, 90, -60, 80, -75, 68, -65, 58, -55, 48, -45, 38, -35, 28, -25, 18, -10, 12, -8, 10, -6, 8, -5, 6, -3, 4, 0];
+                    const step = (hx2 - hx1) / (amps.length - 1);
+                    amps.forEach((amp, i) => { d += `L${hx1 + i * step},${cy + amp} `; });
+                    d += `C${hx2},${cy + 40} ${cx},${cy + 80} ${cx},${h} `;
+                } else {
+                    const hasImg = block.querySelector('.story-image')?.getAttribute('src') !== "";
+                    if (hasImg) {
+                        d += `C${cx},${cy - 120} ${tx},${cy - 60} ${tx},${cy} `;
+                        d += `C${tx},${cy + 60} ${cx},${cy + 120} ${cx},${h} `;
+                    } else {
+                        d += `L${cx},${h} `;
+                    }
+                }
+                
+                path.setAttribute('d', d);
+
+                const pathLength = path.getTotalLength() + 2; 
+                gsap.set(path, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
+
+                // 2. ДОБАВЛЯЕМ ЗАМОРОЗКУ ТОЛЬКО ДЛЯ ЗВУКОВОЙ ВОЛНЫ
+                if (block.id === 'voice-block') {
+                    const pinST = ScrollTrigger.create({
+                        trigger: block,
+                        start: "center center", 
+                        end: "+=100",          // Замораживаем на 1000px
+                        pin: true               // Экран стоит на месте
+                    });
+                    stTriggers.push(pinST);
+                }
+
+                // 3. АНИМАЦИЯ РИСОВАНИЯ (ДЛЯ ВСЕХ БЛОКОВ)
+                const isLastBlock = index === blocks.length - 1;
+                
+                const drawST = ScrollTrigger.create({
+                    trigger: block,
+                    start: "top center", // Начинаем рисовать, когда верх блока доходит до центра
+                    // Последний блок дорисовываем в пол, остальные - когда низ блока дойдет до центра
+                    end: isLastBlock ? "bottom bottom" : "bottom center", 
+                    scrub: true,
+                    animation: gsap.to(path, { strokeDashoffset: 0, ease: "none" })
+                });
+                stTriggers.push(drawST);
+                
+                // 4. Появление текста (один раз)
+                if (!block.dataset.animated) {
+                    block.dataset.animated = "true";
+                    const text = block.querySelector(".story-text");
+                    const visual = block.querySelector(".story-visual");
+                    if (text) gsap.from(text, { scrollTrigger: { trigger: block, start: "top 80%" }, y: 30, opacity: 0, duration: 1.2, ease: "power2.out" });
+                    if (visual?.innerHTML.trim() !== "") gsap.from(visual, { scrollTrigger: { trigger: block, start: "top 80%" }, y: 30, opacity: 0, duration: 1.2, ease: "power2.out", delay: 0.2 });
+                }
+            });
+
+            ScrollTrigger.refresh();
+        }
+
+        // Запуск
+        buildStoryLines();
+
+        // Авто-пересчет при ресайзе экрана или дозагрузке шрифтов
+        let resizeTimer;
+        const ro = new ResizeObserver(() => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                buildStoryLines();
+            }, 100);
+        });
+        ro.observe(document.body);
+    });
+</script>
+</body>
+</html>
