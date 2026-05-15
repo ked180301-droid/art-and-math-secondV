@@ -1,7 +1,7 @@
 {
   "name": "Наш Мир",
   "short_name": "Наш Мир",
-  "start_url": "./index.html",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#F7F5F0",
   "theme_color": "#F7F5F0",
