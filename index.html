@@ -23,6 +23,32 @@
   }
 </script>
     
+<script>
+    // === ЛОГИКА СЕКРЕТНОГО СЛОВА ===
+function checkMasterPassword() {
+    // Получаем то, что ввели, убираем пробелы и делаем маленькими буквами
+    const pass = document.getElementById('master-pass-input').value.trim().toLowerCase();
+    
+    // ТУТ ВАШ ПАРОЛЬ (напиши его маленькими буквами)
+    if (pass === "120596180301260924") { 
+        document.getElementById('master-password-screen').style.display = 'none';
+        
+        // Запоминаем в браузере, что мы ввели правильный пароль, 
+        // чтобы не вводить его при каждом обновлении страницы
+        localStorage.setItem('site_unlocked', 'true');
+    } else {
+        document.getElementById('master-error').style.display = 'block';
+    }
+}
+
+// При загрузке сайта проверяем: если мы уже вводили пароль ранее, прячем этот экран
+document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem('site_unlocked') === 'true') {
+        const screen = document.getElementById('master-password-screen');
+        if (screen) screen.style.display = 'none';
+    }
+});
+    </script>
 
         <style>
         /* ========================================= */
@@ -722,6 +748,7 @@ body.modal-open {
         <button class="menu-item" onclick="toggleMenu(); window.togglePolaroidWindow();">📸 Добавить воспоминание</button>
         <button class="menu-item" onclick="toggleMenu(); window.toggleHabits();">🌱 Привычки</button>
         <button class="menu-item" onclick="toggleMenu(); window.toggleSurpriseWindow();">💌 Отправить сюрприз</button>
+        <button class="menu-item" id="install-app-btn" style="display: none; background: #ffe4e1; color: #d93838; font-weight: bold;" onclick="installApp()">📲 Установить приложение</button>
         <button class="menu-item" style="margin-top: 15px;" onclick="toggleMenu(); window.logoutUser();">🚪 Выйти из аккаунта</button>
     </div>
 </div>
@@ -1473,30 +1500,7 @@ body.modal-open {
     <!-- ========================================= -->
     <script>
 
-// === ЛОГИКА СЕКРЕТНОГО СЛОВА ===
-function checkMasterPassword() {
-    // Получаем то, что ввели, убираем пробелы и делаем маленькими буквами
-    const pass = document.getElementById('master-pass-input').value.trim().toLowerCase();
-    
-    // ТУТ ВАШ ПАРОЛЬ (напиши его маленькими буквами)
-    if (pass === "120596180301260924") { 
-        document.getElementById('master-password-screen').style.display = 'none';
-        
-        // Запоминаем в браузере, что мы ввели правильный пароль, 
-        // чтобы не вводить его при каждом обновлении страницы
-        localStorage.setItem('site_unlocked', 'true');
-    } else {
-        document.getElementById('master-error').style.display = 'block';
-    }
-}
 
-// При загрузке сайта проверяем: если мы уже вводили пароль ранее, прячем этот экран
-document.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem('site_unlocked') === 'true') {
-        const screen = document.getElementById('master-password-screen');
-        if (screen) screen.style.display = 'none';
-    }
-});
     // === ЛОГИКА АВТОРИЗАЦИИ (ВЫБОР АВАТАРКИ) ===
     window.currentUser = null; // Здесь будем хранить имя: "Даня" или "Эвелина"
 
@@ -3871,6 +3875,56 @@ window.closeSurprise = async function() {
         } catch (e) { console.error(e); }
     }
 };
+        // === ЛОГИКА УСТАНОВКИ ПРИЛОЖЕНИЯ (PWA) ===
+let deferredPrompt;
+const installBtn = document.getElementById('install-app-btn');
+
+// Проверяем, это iPhone/iPad или нет (там особая установка)
+const isIos = () => {
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test(userAgent);
+};
+
+// Проверяем, открыт ли сайт уже как приложение
+const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
+// Слушаем событие от Android (Chrome/Edge), что приложение можно установить
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Отменяем стандартное всплывающее окно
+  e.preventDefault();
+  // Сохраняем событие для нашей кнопки
+  deferredPrompt = e;
+  // Показываем кнопку в меню
+  if (installBtn) installBtn.style.display = 'flex';
+});
+
+// Если это iOS (iPhone), просто показываем кнопку сразу (если еще не установлено)
+if (isIos() && !isInStandaloneMode()) {
+  if (installBtn) installBtn.style.display = 'flex';
+}
+
+// Функция при нажатии на кнопку "Установить приложение"
+window.installApp = async function() {
+  if (isIos()) {
+    // Для iPhone показываем инструкцию
+    alert("Чтобы установить Наш Мир на iPhone:\n1. Нажмите иконку «Поделиться» (квадрат со стрелочкой вверх) внизу экрана.\n2. Выберите «На экран \"Домой\"» 📱");
+  } else if (deferredPrompt) {
+    // Для Android запускаем официальное окно установки
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('Приложение установлено!');
+      installBtn.style.display = 'none'; // Прячем кнопку после установки
+    }
+    deferredPrompt = null;
+  }
+};
+
+// Если приложение успешно установилось (любым способом), прячем кнопку
+window.addEventListener('appinstalled', () => {
+  if (installBtn) installBtn.style.display = 'none';
+  deferredPrompt = null;
+});
 </script>
 </body>
 </html>
