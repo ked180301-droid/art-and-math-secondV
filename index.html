@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1200">
     <meta name="robots" content="noindex, nofollow">
     <title>Наш мир | Технологии и искусство</title>
     <!-- Заранее подключаемся к серверам (ускоряет загрузку на 30%) -->
@@ -13,7 +13,12 @@
     <script src="calendar.js"></script>
 <!-- Подключаем манифест -->
 <link rel="manifest" href="manifest.json">
-
+<!-- ЖЕСТКО ЗАДАЕМ РЕЖИМ ПРИЛОЖЕНИЯ ДЛЯ IOS И ANDROID -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Наш Мир">
+<link rel="apple-touch-icon" href="icon.png">
 <!-- Регистрируем Service Worker -->
 <script>
   if ('serviceWorker' in navigator) {
