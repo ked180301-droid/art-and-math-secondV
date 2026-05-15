@@ -1930,22 +1930,14 @@ window.toggleMute = function() {
 
         let emptyNotepadEggShown = false; // Флаг, чтобы кровать не вылезала каждый раз
 
-        function toggleNotepad() {
+               function toggleNotepad() {
             notepadOverlay.classList.toggle('hidden');
             
             if (!notepadOverlay.classList.contains('hidden')) {
                 // Если блокнот открылся
                 taskInput.focus(); 
-            } else {
-                // Если блокнот только что закрылся — проверяем задачи!
-                if (!emptyNotepadEggShown && tasks.length === 0 && taskInput && taskInput.value.trim() === '') {
-                    // Небольшая задержка, чтобы блокнот успел плавно исчезнуть перед появлением пасхалки
-                    setTimeout(() => {
-                       // showSecret("🛏️", "Никаких планов? Отлично, значит сегодня легально валяемся в кровати и ничего не делаем!");
-                    }, 300);
-                    emptyNotepadEggShown = true; 
-                }
             }
+            // ВСЮ старую логику с пасхалкой отсюда МЫ УДАЛИЛИ
         }
 
         function closeNotepadOutside(e) {
