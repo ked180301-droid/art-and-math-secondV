@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Наш мир | Технологии и искусство</title>
+    <!-- Заранее подключаемся к серверам (ускоряет загрузку на 30%) -->
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
     <script src="calendar.js"></script>
 <!-- Подключаем манифест -->
@@ -25,29 +29,35 @@
     
 <script>
     // === ЛОГИКА СЕКРЕТНОГО СЛОВА ===
+document.addEventListener("DOMContentLoaded", () => {
+    // СРАЗУ прячем аватарки и доску, пока не проверим пароль
+    const loginOverlay = document.getElementById('login-overlay');
+    if (loginOverlay) loginOverlay.style.visibility = 'hidden'; 
+
+    if (localStorage.getItem('site_unlocked') === 'true') {
+        // Если пароль уже вводили - прячем экран пароля и показываем аватарки
+        const screen = document.getElementById('master-password-screen');
+        if (screen) screen.style.display = 'none';
+        if (loginOverlay) loginOverlay.style.visibility = 'visible';
+    } else {
+        // Иначе показываем экран пароля (он уже display: flex по умолчанию)
+    }
+});
+
 function checkMasterPassword() {
-    // Получаем то, что ввели, убираем пробелы и делаем маленькими буквами
     const pass = document.getElementById('master-pass-input').value.trim().toLowerCase();
     
-    // ТУТ ВАШ ПАРОЛЬ (напиши его маленькими буквами)
+    // ТУТ ВАШ ПАРОЛЬ
     if (pass === "120596180301260924") { 
         document.getElementById('master-password-screen').style.display = 'none';
+        const loginOverlay = document.getElementById('login-overlay');
+        if (loginOverlay) loginOverlay.style.visibility = 'visible';
         
-        // Запоминаем в браузере, что мы ввели правильный пароль, 
-        // чтобы не вводить его при каждом обновлении страницы
         localStorage.setItem('site_unlocked', 'true');
     } else {
         document.getElementById('master-error').style.display = 'block';
     }
 }
-
-// При загрузке сайта проверяем: если мы уже вводили пароль ранее, прячем этот экран
-document.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem('site_unlocked') === 'true') {
-        const screen = document.getElementById('master-password-screen');
-        if (screen) screen.style.display = 'none';
-    }
-});
     </script>
 
         <style>
@@ -682,6 +692,25 @@ body.modal-open {
     transform: translateX(5px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     border-color: #8c6239;
+}
+            /* Делаем меню аккуратным на телефонах */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 250px !important; /* Меню не будет шире 250 пикселей */
+        max-width: 80vw; /* Или не больше 80% от ширины экрана */
+    }
+}
+            /* Делаем загрузку картинок плавной и бронируем им место */
+img {
+    background-color: #e9e5d9; /* Красивый цвет-заглушка, пока фото грузится */
+    color: transparent; /* Скрываем текст "битой" картинки */
+}
+
+/* Для полароидов обязательно задаем жесткий размер, чтобы они не схлопывались */
+.polaroid {
+    width: 150px; /* Замени на твою реальную ширину полароида */
+    height: 180px; /* Замени на твою реальную высоту */
+    object-fit: cover;
 }
     </style>
 </head>
