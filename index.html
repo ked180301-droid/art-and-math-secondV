@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1200">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Наш мир | Технологии и искусство</title>
     <!-- Заранее подключаемся к серверам (ускоряет загрузку на 30%) -->
@@ -11,26 +11,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
     <script src="calendar.js"></script>
-<!-- Подключаем манифест -->
-<link rel="manifest" href="manifest.json">
-<!-- ЖЕСТКО ЗАДАЕМ РЕЖИМ ПРИЛОЖЕНИЯ ДЛЯ IOS И ANDROID -->
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Наш Мир">
-<link rel="apple-touch-icon" href="icon.png">
-<!-- Регистрируем Service Worker -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('./sw.js').then(function(registration) {
-        console.log('ServiceWorker успешно зарегистрирован!');
-      }, function(err) {
-        console.log('Ошибка регистрации ServiceWorker: ', err);
-      });
-    });
-  }
-</script>
     
 <script>
     // === ЛОГИКА СЕКРЕТНОГО СЛОВА ===
@@ -772,7 +752,6 @@ body.modal-open {
         <button class="menu-item" onclick="toggleMenu(); window.togglePolaroidWindow();">📸 Добавить воспоминание</button>
         <button class="menu-item" onclick="toggleMenu(); window.toggleHabits();">🌱 Привычки</button>
         <button class="menu-item" onclick="toggleMenu(); window.toggleSurpriseWindow();">💌 Отправить сюрприз</button>
-        <button class="menu-item" id="install-app-btn" style="display: none; background: #ffe4e1; color: #d93838; font-weight: bold;" onclick="installApp()">📲 Установить приложение</button>
         <button class="menu-item" style="margin-top: 15px;" onclick="toggleMenu(); window.logoutUser();">🚪 Выйти из аккаунта</button>
     </div>
 </div>
@@ -3636,16 +3615,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 2. Блокнот: проверка пустых планов при закрытии
-    // Находим кнопку крестика в окне блокнота
     const notepadOverlay = document.getElementById('notepad-overlay');
     if (notepadOverlay) {
         const closeBtn = notepadOverlay.querySelector('.notepad-close');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
-                const currentTasksCount = document.querySelectorAll('#task-list .task-item').length;
-                if (currentTasksCount === 0 && taskInput && taskInput.value.trim() === '') {
+                // Считаем задачи ВО ВСЕХ возможных списках (и личных, и общих)
+                // Ищем как по классу .task-item, так и просто по тегам списка <li>
+                const personalTasks = document.querySelectorAll('#task-list li, #task-list .task-item').length;
+                const sharedTasks = document.querySelectorAll('#shared-task-list li, #shared-task-list .task-item').length;
+                
+                const totalTasks = personalTasks + sharedTasks; // Складываем все задачи вместе
+
+                // Срабатывает ТОЛЬКО если задач вообще ноль И поле ввода пустое
+                if (totalTasks === 0 && taskInput && taskInput.value.trim() === '') {
                     if (typeof showSecret === 'function') {
-                        showSecret("🛏️", "Никаких планов? Отлично, значит сегодня легально валяемся в кровати и ничего не делаем!");
+                        showSecret("✨", "Никаких планов? Отлично, значит можно придумать что-нибудь интересное!");
                     }
                 }
             });
@@ -3899,56 +3884,6 @@ window.closeSurprise = async function() {
         } catch (e) { console.error(e); }
     }
 };
-        // === ЛОГИКА УСТАНОВКИ ПРИЛОЖЕНИЯ (PWA) ===
-let deferredPrompt;
-const installBtn = document.getElementById('install-app-btn');
-
-// Проверяем, это iPhone/iPad или нет (там особая установка)
-const isIos = () => {
-  const userAgent = window.navigator.userAgent.toLowerCase();
-  return /iphone|ipad|ipod/.test(userAgent);
-};
-
-// Проверяем, открыт ли сайт уже как приложение
-const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
-
-// Слушаем событие от Android (Chrome/Edge), что приложение можно установить
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Отменяем стандартное всплывающее окно
-  e.preventDefault();
-  // Сохраняем событие для нашей кнопки
-  deferredPrompt = e;
-  // Показываем кнопку в меню
-  if (installBtn) installBtn.style.display = 'flex';
-});
-
-// Если это iOS (iPhone), просто показываем кнопку сразу (если еще не установлено)
-if (isIos() && !isInStandaloneMode()) {
-  if (installBtn) installBtn.style.display = 'flex';
-}
-
-// Функция при нажатии на кнопку "Установить приложение"
-window.installApp = async function() {
-  if (isIos()) {
-    // Для iPhone показываем инструкцию
-    alert("Чтобы установить Наш Мир на iPhone:\n1. Нажмите иконку «Поделиться» (квадрат со стрелочкой вверх) внизу экрана.\n2. Выберите «На экран \"Домой\"» 📱");
-  } else if (deferredPrompt) {
-    // Для Android запускаем официальное окно установки
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('Приложение установлено!');
-      installBtn.style.display = 'none'; // Прячем кнопку после установки
-    }
-    deferredPrompt = null;
-  }
-};
-
-// Если приложение успешно установилось (любым способом), прячем кнопку
-window.addEventListener('appinstalled', () => {
-  if (installBtn) installBtn.style.display = 'none';
-  deferredPrompt = null;
-});
 </script>
 </body>
 </html>
